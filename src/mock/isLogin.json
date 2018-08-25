@@ -1,0 +1,10 @@
+{
+  "success": "true",
+  "resultCode": "0",
+  "errorMsg": "\u64cd\u4f5c\u6210\u529f",
+  "result": {
+    "uid": "1",
+    "username": "admin"
+  },
+  "limit": 0
+}
