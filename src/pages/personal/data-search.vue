@@ -148,7 +148,7 @@
             })
             break
         }
-        this.$store.dispatch('getDrawList', data)
+        this.$store.dispatch('getPersonalList', data)
         //重置快捷上线时间搜索
         this.last_days = 0
       },
@@ -195,7 +195,7 @@
         this.initList()
       },
       ...mapActions([
-        'getDrawList'
+        'getPersonalList'
       ])
     }
   }

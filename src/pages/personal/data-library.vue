@@ -145,11 +145,11 @@
     computed: {
       //是否显示加载loading
       isLoading() {
-        return this.$store.state.draw.isLoading
+        return this.$store.state.personal.isLoading
       },
       //抽奖活动列表数据
       drawList() {
-        return this.$store.state.draw.list
+        return this.$store.state.personal.list
       }
     },
     methods: {
@@ -159,7 +159,7 @@
           page: this.page,
           size: this.drawList.size
         })
-        this.$store.dispatch('getDrawList', data)
+        this.$store.dispatch('getPersonalList', data)
       },
       //删除活动(上线弹提示，未上线直接删除)
       delItem(item) {
@@ -288,7 +288,7 @@
         this.initList()
       },
       ...mapActions([
-        'getDrawList'
+        'getPersonalList'
       ])
     },
     components: {

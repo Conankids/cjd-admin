@@ -124,4 +124,15 @@ export function sendPushMsg(data = {}) {
   return request(config)
 }
 
+//获取个人抽奖活动列表数据
+export function getIndividualList(data = {}) {
+  const config = Object.assign(data, {
+    method: 'get',
+    url: '/admin/Lotterylist/IndividualList'
+  })
+  return request(config)
+}
+
+
+
 

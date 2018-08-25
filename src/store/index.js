@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import draw from './module/draw'
+import personal from './module/personal'
 
 Vue.use(Vuex)
 
@@ -19,6 +20,7 @@ export default new Vuex.Store({
   },
   actions: {},
   modules: {
-    draw
+    draw,
+    personal
   }
 })
