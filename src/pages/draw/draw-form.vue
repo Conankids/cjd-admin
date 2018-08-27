@@ -15,7 +15,7 @@
                     <strong>抽奖类型</strong>
                 </div>
                 <div class="typeList ">
-                    <div class="typeOne" v-for="(item,index) in options.adminTypeList" :key="index" :class="{choosed:choosed==item.type}" v-on:click="chooseType(item)">
+                    <div class="typeOne" v-for="(item,index) in options.adminTypeList" :key="index" :class="{choosed:choosed==item.type}" v-on:click="chooseType(item)" >
                         <div class="drawName ft16">
                             <i class="ft24" :class="item.icon"></i>
                             <strong><label>{{item.title}}</label></strong>
@@ -620,7 +620,7 @@
                 })
             },
             chooseType(item) {
-               if(item.type) {
+               if(item.type && this.formData.status!=1) {
                     this.info.admin_type = item.type
                     this.choosed=item.type
                 }

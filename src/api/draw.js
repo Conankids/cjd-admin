@@ -93,7 +93,7 @@ export function getItemData(data = {}) {
 export function getData(data = {}) {
   const config = Object.assign(data, {
     method: 'get',
-    url: 'admin/Lotterylist/GetIndividualTotalShowData'
+    url: '/admin/Lotterylist/GetIndividualTotalShowData'
   })
   return request(config)
 }
@@ -132,7 +132,14 @@ export function getIndividualList(data = {}) {
   })
   return request(config)
 }
-
+//获取小程序码
+export function getCode(data = {}) {
+  const config = Object.assign(data, {
+    method: 'get',
+    url: '/admin/Lotterylist/getXcxUrl'
+  })
+  return request(config)
+}
 
 
 
