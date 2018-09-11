@@ -12,7 +12,8 @@
           <div slot="content">
             <span>开奖：{{item.lottery_time}}</span>
             <span class="ml10">条件：{{item.apply_condition_tips}}</span>
-            <span class="ml10" v-if="item.admin_type==2">{{item.is_team === '1' ? `可组${item.team_num}人队` : '不可组队'}}</span>
+            <span class="ml10"
+                  v-if="item.admin_type==2">{{item.is_team === '1' ? `可组${item.team_num}人队` : '不可组队'}}</span>
           </div>
           <div slot="bottom">
             <div class="gray"></div>
@@ -35,7 +36,13 @@
                           placement="top"
                           v-if="/(online)/.test(type)">
                 <el-button icon="font-icon-qrcode" size="small" circle
-                           @click.prevent="openQrcodeLayer(item)"></el-button>
+                           @click.prevent="showCode(item)"></el-button>
+              </el-tooltip>
+              <el-tooltip content="排序值"
+                          placement="top"
+                          v-if="/(online)/.test(type)">
+                <el-button icon="font-icon-sort" size="small" circle
+                           @click.prevent="showSortCode(item)"></el-button>
               </el-tooltip>
               <el-tooltip content="上线"
                           placement="top"
@@ -68,23 +75,23 @@
       </ul>
       <el-row class="mt30 tc" v-if="drawList && (drawList.count>drawList.size)">
         <el-pagination
-            @current-change="handleCurrentChange"
-            :background="true"
-            :current-page="Number(drawList.page)"
-            :page-size="Number(drawList.size)"
-            layout="total, prev, pager, next, jumper"
-            :total="Number(drawList.count)">
+          @current-change="handleCurrentChange"
+          :background="true"
+          :current-page="Number(drawList.page)"
+          :page-size="Number(drawList.size)"
+          layout="total, prev, pager, next, jumper"
+          :total="Number(drawList.count)">
         </el-pagination>
       </el-row>
     </div>
     <el-dialog
-        class="flex-center"
-        title="小程序二维码"
-        top="0"
-        width="420px"
-        :visible="isShowQrcode"
-        :close-on-click-modal="false"
-        @close="closeQrcodeLayer">
+      class="flex-center"
+      title="小程序二维码"
+      top="0"
+      width="420px"
+      :visible="isShowQrcode"
+      :close-on-click-modal="false"
+      @close="closeQrcodeLayer">
       <div class="tc"
            v-loading="!qrcode"
            element-loading-spinner="el-icon-loading"
@@ -95,11 +102,11 @@
           <p class="wxcode-url">
             <span>{{wxcode_url}}</span>
             <el-button
-                type="text"
-                size="mini"
-                v-clipboard:copy="wxcode_url"
-                v-clipboard:success="onCopy"
-                v-clipboard:error="onError">复制
+              type="text"
+              size="mini"
+              v-clipboard:copy="wxcode_url"
+              v-clipboard:success="onCopy"
+              v-clipboard:error="onError">复制
             </el-button>
           </p>
         </div>
@@ -108,13 +115,13 @@
 
     <!--删除弹窗-->
     <el-dialog
-        class="flex-center"
-        title="提示"
-        top="0"
-        width="420px"
-        :visible="isShowDel"
-        :close-on-click-modal="false"
-        @close="closeDelLayer">
+      class="flex-center"
+      title="提示"
+      top="0"
+      width="420px"
+      :visible="isShowDel"
+      :close-on-click-modal="false"
+      @close="closeDelLayer">
       <div>
         <p>进行中的活动不允许删除</p>
         <el-checkbox v-model="isKnow">我已了解删除风险</el-checkbox>
@@ -132,7 +139,7 @@
 
 <script>
   import {mapActions} from 'vuex'
-  import {online, offline, del} from '@/api/draw'
+  import {online, offline, del, getCode, setSortCode} from '@/api/draw'
   import ListItem from './list-item'
   import Search from './draw-search'
 
@@ -275,11 +282,19 @@
         }
       },
       //打开二维码弹窗
-      openQrcodeLayer(item) {
+      showCode(item) {
         this.isShowQrcode = true
-        this.qrcode = item.wxcode_qrcode_url
-        this.wxcode_url = item.wxcode_url
+        getCode({
+          params: {
+            id: item.id
+          }
+        }).then(res => {
+          this.qrcode = res.result.wxcode_qrcode_url
+          this.wxcode_url = item.wxcode_url
+        }).catch(() => {
+        })
       },
+
       //关闭二维码弹窗
       closeQrcodeLayer() {
         this.isShowQrcode = false
@@ -297,6 +312,31 @@
       closeDelLayer() {
         this.isShowDel = false
         this.isKnow = ''
+      },
+      showSortCode(item) {
+        this.$prompt('排序值越大越靠前', '设置排序值', {
+          confirmButtonText: '保存',
+          cancelButtonText: '取消',
+          inputPattern: /\d/,
+          inputErrorMessage: '排序值只能是数值',
+          inputValue: item.listorder,
+          inputPlaceholder: '请输入排序值'
+        }).then(({value}) => {
+          setSortCode({
+            params:{
+              id:item.id,
+              listorder:value
+            }
+          }).then(res=>{
+            if(res.resultCode==0){
+              this.$message.success(res.errorMsg)
+              this.initList()
+            }else{
+              this.$message.error(res.errorMsg)
+            }
+          })
+        }).catch(() => {
+        })
       },
       //翻页
       handleCurrentChange(val) {

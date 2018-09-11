@@ -36,7 +36,7 @@
                           placement="top"
                           >
                 <el-button icon="font-icon-qrcode" size="small" circle
-                           @click.prevent="openQrcodeLayer(item)"></el-button>
+                           @click.prevent="showCode(item)"></el-button>
               </el-tooltip>
               <el-tooltip content="删除"
                           placement="top">
@@ -114,7 +114,7 @@
 
 <script>
   import {mapActions} from 'vuex'
-  import {online, offline, del} from '@/api/draw'
+  import {online, offline, del, getCode} from '@/api/draw'
   import ListItem from './datalist-item'
   import Search from './data-search'
 
@@ -259,10 +259,18 @@
         }
       },
       //打开二维码弹窗
-      openQrcodeLayer(item) {
+      showCode(item) {
         this.isShowQrcode = true
-        this.qrcode = item.wxcode_qrcode_url
-        this.wxcode_url = item.wxcode_url
+        getCode({
+          params: {
+            id: item.id
+          }
+        }).then(res => {
+          this.qrcode = res.result.wxcode_qrcode_url
+          this.wxcode_url = item.wxcode_url
+        }).catch(() => {
+
+        })
       },
       //关闭二维码弹窗
       closeQrcodeLayer() {

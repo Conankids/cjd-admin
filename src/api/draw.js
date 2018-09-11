@@ -132,7 +132,23 @@ export function getIndividualList(data = {}) {
   })
   return request(config)
 }
+//获取小程序码
+export function getCode(data = {}) {
+  const config = Object.assign(data, {
+    method: 'get',
+    url: '/admin/Lotterylist/getXcxUrl'
+  })
+  return request(config)
+}
 
+//设置活动排序
+export function setSortCode(data = {}) {
+  const config = Object.assign(data, {
+    method: 'get',
+    url: '/admin/lotterylist/SetListorder'
+  })
+  return request(config)
+}
 
 
 

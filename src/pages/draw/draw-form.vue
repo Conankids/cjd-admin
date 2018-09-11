@@ -624,7 +624,7 @@
                 })
             },
             chooseType(item) {
-               if(item.type) {
+               if(item.type && this.formData.status!=1) {
                     this.info.admin_type = item.type
                     this.choosed=item.type
                 }
