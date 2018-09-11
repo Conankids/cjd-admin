@@ -10,12 +10,17 @@
 
         <!--抽奖类型设置-->
         <el-form-item>
-            <div class="typeSet ">
+            <div class="typeSet">
                 <div class="typeTitle ft20">
                     <strong>抽奖类型</strong>
                 </div>
-                <div class="typeList ">
-                    <div class="typeOne" v-for="(item,index) in options.adminTypeList" :key="index" :class="{choosed:choosed==item.type}" v-on:click="chooseType(item)">
+                <div class="typeList" :class="{'once':isEdit}">
+                    <div class="typeOne"
+                         v-for="(item,index) in options.adminTypeList"
+                         :key="index"
+                         :class="{choosed:choosed==item.type}"
+                         v-on:click="chooseType(item)"
+                          v-if="(info.admin_type==item.type && isEdit) || !isEdit">
                         <div class="drawName ft16">
                             <i class="ft24" :class="item.icon"></i>
                             <strong><label>{{item.title}}</label></strong>
@@ -29,7 +34,7 @@
             <strong>抽奖信息设置</strong>
         </div>
         <!--上传封面图-->
-        <el-form-item v-s>
+        <el-form-item>
             <el-upload
                     class="uploader"
                     action="/admin/Lotterylist/UploadImg"
@@ -77,8 +82,7 @@
                             label="价格："
                             label-width="60px"
                             size="small"
-                            :prop="`meta_list.${index}.price`"
-                            :rules="[{validator: price_rule, trigger: 'change'}]">
+                            :prop="`meta_list.${index}.price`">
                 <el-input class="w140" v-model="item.price" type="number" ></el-input>
                 元
               </el-form-item>
@@ -389,7 +393,7 @@
                         {
                             title: '',
                             num: '',
-                            price:'1',
+                            price:'',
                         }
                     ],
                     cover: '',  //封面图
@@ -505,16 +509,16 @@
                     }
                     console.log(1)
                     window.onscroll = () => {
-                        console.log(2)
                         //屏幕宽度低于最小body宽时保证提交按钮悬浮在正确的位置
-                        const scrollLeft = document.querySelector('html,body').scrollLeft
+                        const scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
                         let subWrapLeftNum = subWrapLeft
                         subWrapLeftNum -= scrollLeft
                         this.$refs['subWrap'].style.left = `${subWrapLeftNum}px`
 
                         //二维码悬浮
                         if (this.formData.status === '1') {
-                            const scrollTop = document.querySelector('html,body').scrollTop
+                            const scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+                            console.log(scrollTop)
                             let qrcodeTopNum = qrcodeTop
                             qrcodeTopNum += scrollTop
                             this.$refs['qrcode'].style.top = `${qrcodeTopNum}px`
@@ -652,6 +656,9 @@
         flex-direction: row;
         justify-content: space-around;
         align-items: center;
+      &.once{
+        justify-content: space-between;
+      }
     }
 
     .typeOne{

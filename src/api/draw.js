@@ -93,7 +93,7 @@ export function getItemData(data = {}) {
 export function getData(data = {}) {
   const config = Object.assign(data, {
     method: 'get',
-    url: 'admin/Lotterylist/GetIndividualTotalShowData'
+    url: '/admin/Lotterylist/GetIndividualTotalShowData'
   })
   return request(config)
 }
