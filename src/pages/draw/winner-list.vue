@@ -72,26 +72,30 @@
           width="220px"
           label="收货信息">
         <template slot-scope="scope">
-          <div v-if="scope.row.express_note">{{scope.row.express_note}}</div>
+          <div v-if="scope.row.lottery_type ==3">兑换码：{{scope.row.ticket_code}}</div>
+          <div v-else-if="scope.row.lottery_type ==2">{{`跳转至“${scope.row.wxcode_title}”小程序领取`}}</div>
           <div v-else>
-            <p class="flex-right-auto">
-              <span class="gray">姓名：</span>
-              <span class="flex-right">{{scope.row.receive_address.userName}}</span>
-            </p>
-            <p class="flex-right-auto">
-              <span class="gray">手机：</span>
-              <span class="flex-right">{{scope.row.receive_address.telNumber}}</span>
-            </p>
-            <p class="flex-right-auto">
-              <span class="gray">地址：</span>
-              <span
+            <div v-if="scope.row.express_note">{{scope.row.express_note}}</div>
+            <div v-else>
+              <p class="flex-right-auto">
+                <span class="gray">姓名：</span>
+                <span class="flex-right">{{scope.row.receive_address.userName}}</span>
+              </p>
+              <p class="flex-right-auto">
+                <span class="gray">手机：</span>
+                <span class="flex-right">{{scope.row.receive_address.telNumber}}</span>
+              </p>
+              <p class="flex-right-auto">
+                <span class="gray">地址：</span>
+                <span
                   class="flex-right">{{scope.row.receive_address.provinceName + scope.row.receive_address.cityName + scope.row.receive_address.countyName + scope.row.receive_address.detailInfo
-                }}</span>
-            </p>
-            <p class="flex-right-auto">
-              <span class="gray">备注：</span>
-              <span class="flex-right">{{scope.row.receive_remarks}}</span>
-            </p>
+                  }}</span>
+              </p>
+              <p class="flex-right-auto">
+                <span class="gray">备注：</span>
+                <span class="flex-right">{{scope.row.receive_remarks}}</span>
+              </p>
+          </div>
           </div>
         </template>
       </el-table-column>
@@ -232,6 +236,7 @@
       },
       //切换奖品
       changeMeta() {
+        this.page = 1
         this._getLotteryList()
       },
       //发送提醒push

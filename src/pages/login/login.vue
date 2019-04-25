@@ -27,6 +27,9 @@
   import Cookies from 'js-cookie'
   import qs from 'qs'
 
+  const TEL = process.env.NODE_ENV === 'production' ? '' : '13521140383'
+  const PWD = process.env.NODE_ENV === 'production' ? '' : '123456'
+
   export default {
     data() {
       const validateUsername = (rule, value, callback) => {
@@ -45,8 +48,8 @@
       }
       return {
         form: {
-          tel: '',
-          password: ''
+          tel: TEL,
+          password: PWD
         },
         rules: {
           tel: [{validator: validateUsername, trigger: 'blur'}],

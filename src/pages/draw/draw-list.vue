@@ -286,7 +286,8 @@
         this.isShowQrcode = true
         getCode({
           params: {
-            id: item.id
+            id: item.id,
+            is_admin: 1
           }
         }).then(res => {
           this.qrcode = res.result.wxcode_qrcode_url

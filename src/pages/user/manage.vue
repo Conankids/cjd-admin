@@ -8,6 +8,9 @@
       <el-form-item label="用户id：">
         <el-input class="w140" v-model="search.uid"></el-input>
       </el-form-item>
+      <el-form-item label="手机号：">
+        <el-input class="w140" v-model="search.tel"></el-input>
+      </el-form-item>
       <el-form-item label="用户状态：">
         <el-select class="w140" v-model="search.is_ban">
           <el-option v-for="(item,index) in options"
@@ -31,6 +34,10 @@
       <el-table-column
           prop="uid"
           label="用户ID">
+      </el-table-column>
+      <el-table-column
+        prop="tel"
+        label="手机号">
       </el-table-column>
       <el-table-column
           prop="reg_date"
@@ -120,6 +127,7 @@
         },
         search: { //搜索数据
           username: '',
+          tel: '',
           uid: '',
           is_ban: ''
         },

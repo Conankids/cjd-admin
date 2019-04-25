@@ -21,7 +21,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */
@@ -39,10 +39,10 @@ module.exports = {
 
   build: {
     // Template for index.html
-    index: path.resolve(__dirname, '../dist/index.php'),
+    index: path.resolve(__dirname, '../../../jiguozhidx/cj/protected/modules/admin/views/index/index.php'),
 
     // Paths
-    assetsRoot: path.resolve(__dirname, '../dist'),
+    assetsRoot: path.resolve(__dirname, '../../../jiguozhidx/jiguo-dev/cdn/cjd'),
     assetsSubDirectory: 'static',
     assetsPublicPath: 'http://cdn.jiguo.com/cjd/',
 

@@ -21,10 +21,18 @@
             {
               title: '',
               num: '',
-              price:'1'
+              price:'1',
+              meta_type: 1,
+              lottery_type: 1,
+              wxcode_id: '',
+              wxcode_path: '',
+              ticket_code_list: [],
+              ticket_code_desc: ''
             }
           ],
           cover: '',
+          imgs: [],
+          popularity_award: 2,
           detail: '',
           is_sponsor: '0',
           sponsor_name: '',

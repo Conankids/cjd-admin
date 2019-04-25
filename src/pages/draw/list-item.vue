@@ -12,8 +12,15 @@
                  :key="index">
               <span>{{item.title}}</span>
               <span class="ml10">x{{item.num}}</span>
-              <span class="chouCode ft14" v-if="index==0&&listItem.admin_type==3" >抽奖码</span>
-              <span class="teamCode ft14" v-if="index==0&&listItem.admin_type==2">组队</span>
+
+              <span v-if="listItem.popularity_award==1">
+                <span class="renqiCode" v-if="item.meta_type==2 && listItem.admin_type==3">人气奖</span>
+              <span class="chouCode" v-else-if="index==0 && listItem.admin_type==3" >抽奖码</span>
+              </span>
+              <span v-else>
+                 <span class="chouCode" v-if="index==0 && listItem.admin_type==3" >抽奖码</span>
+              <span class="teamCode" v-if="index==0 && listItem.admin_type==2">组队</span>
+              </span>
             </div>
           </div>
           <div class="gray tr">
@@ -54,14 +61,19 @@
 </script>
 
 <style lang="less" scoped>
-  .chouCode,.teamCode{
-    padding: 2px 5px;
+  .chouCode,.teamCode,.renqiCode{
+    padding: 0px 5px;
     color: green;
     border: 1px solid green;
+    font-size: 12px;
   }
   .teamCode{
     color: blue;
     border: 1px solid blue;
+  }
+  .renqiCode{
+    color: gold;
+    border: 1px solid gold;
   }
   li {
     display: flex;

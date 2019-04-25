@@ -1,13 +1,13 @@
 <!--奖品详情-->
 <template>
-  <div class="">
+  <div class="itemWrap" v-if="formData" v-loading="initLoading">
     <div class="itemDesc">
       <div class="itemPic">
-        <img :src="`http://s1.jiguo.com/${formData.cover}`" alt="" >
+        <img :src="`http://s1.jiguo.com/${formData.cover}`" alt="">
       </div>
       <div class="itemText">
         <div class="text" v-for="item in formData.meta_list">
-          <span class="ft20 fc" >{{item.title}}</span>
+          <span class="ft20 fc">{{item.title}}</span>
           <span class="ft16 ml300"><strong>奖品数量：{{item.num}}</strong></span>
         </div>
       </div>
@@ -32,6 +32,9 @@
       <div class="awardType ">
         <div class="type w300"><strong>发起时间：</strong><span class="ml40">{{formData.online_time}}</span></div>
       </div>
+      <div class="awardType " v-if="formData.is_share==1">
+        <div class="type w300"><strong>手机号：</strong><span class="ml40">{{formData.user_tel}}</span></div>
+      </div>
       <div class="awardType ">
         <div class="type w300" v-if="formData.type==1"><strong>开奖方式：</strong><span class="ml40">按时间自动开奖</span></div>
         <div class="type w300" v-if="formData.type==2"><strong>开奖方式：</strong><span class="ml40">按人数自动开奖</span></div>
@@ -39,7 +42,7 @@
       </div>
       <div class="awardTime">
         <div class="type w300"><strong>开奖时间：</strong><span class="ml40">{{formData.lottery_time}}</span></div>
-        <div class="type w300"><strong>开奖人数：</strong><span class="ml40">{{formData.lottery_person_num}}</span></div>
+        <div class="type w300"><strong>开奖人数：</strong><span class="ml40">{{formData.apply_num}}</span></div>
       </div>
     </div>
   </div>
@@ -51,66 +54,79 @@
   import {getItemData} from "@/api/draw"
 
   export default {
-      data(){
-          return{
-            formData:{},
-          }
-      },
-      created() {
-        this._getInfo()
-      },
-      methods: {
-        _getInfo() {
-          const params = {
-            id: this.$route.params.id      //当前路由上的id值
-          }
-          getItemData({  //draw中定义的方法
-            params: params
-          }).then(res => {
-            if (res.resultCode === '0') {
-              this.formData = res.result
-              console.log(res)
-            }
-          })
+    data() {
+      return {
+        initLoading: false,
+        formData: null,
+      }
+    },
+    created() {
+      this._getInfo()
+    },
+    methods: {
+      _getInfo() {
+        const params = {
+          id: this.$route.params.id      //当前路由上的id值
         }
-      },
-    }
+        this.initLoading = true
+        getItemData({  //draw中定义的方法
+          params: params
+        }).then(res => {
+          this.initLoading = false
+          if (res.resultCode === '0') {
+            this.formData = res.result
+          }
+        })
+      }
+    },
+  }
 </script>
 
 <style lang="less">
-.itemDesc{
-  width: 100%;
-}
-.ml300{
-  margin-left: 300px;
-}
-.text{
-  width: 800px;
-  height: 40px;
-  line-height: 40px;
-  margin-bottom: 40px;
-}
-  .itemPic{
+  .itemWrap {
+    min-height: 500px;
+  }
+
+  .itemDesc {
+    width: 100%;
+  }
+
+  .ml300 {
+    margin-left: 300px;
+  }
+
+  .text {
+    width: 800px;
+    height: 40px;
+    line-height: 40px;
+    margin-bottom: 40px;
+  }
+
+  .itemPic {
     width: 700px;
     height: 400px;
     margin-bottom: 40px;
-  img{
-    width: 700px;
+    img {
+      width: 100%;
+    }
   }
-  }
-  .describe{
+
+  .describe {
     margin-bottom: 50px;
   }
-  .awardType{
+
+  .awardType {
     height: 100px;
   }
-  .type{
+
+  .type {
     float: left;
     height: 50px;
     line-height: 50px;
     text-align: left;
   }
-  .awardTime{
+
+  .awardTime {
     height: 50px;
   }
 </style>

@@ -49,7 +49,6 @@
     },
     methods: {
       openCropper() {
-
         this.$nextTick(() => {
           let img = this.$refs.cropperImg
           this.cropper = new Cropper(img, {

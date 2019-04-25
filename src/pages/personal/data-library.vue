@@ -11,7 +11,8 @@
                   :listItem="item"
                   :page_type="type">
           <div slot="content">
-            <span>开奖时间：{{item.lottery_time}}</span>
+            <span class="is_test_phone" v-if="item.is_share==1">已验证手机号</span>
+            <span :class="{'ml10':item.is_share==1}">开奖时间：{{item.lottery_time}}</span>
             <span class="ml10">发起者：{{item.username}}</span>
             <span class="ml10">uid：{{item.uid}}</span>
           </div>
@@ -320,6 +321,9 @@
       h3 {
         font-size: 20px;
       }
+    }
+    .is_test_phone{
+      border: 1px solid #999999;
     }
     .item-control {
       a + .el-button {
