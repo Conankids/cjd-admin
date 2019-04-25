@@ -1,7 +1,9 @@
 <!--奖品列表-->
 <template>
   <div class="list-wrap">
-    <Search :page_type="type" :page_title="pageTitle"/>
+    <!-- cece -->
+    <Search :page_type="type" :page_title="pageTitle" :homepage="is_homepage"/>
+
     <div class="list-box"
          v-loading="isLoading"
          element-loading-text="拼命加载中">
@@ -10,6 +12,7 @@
                   :key="index"
                   :listItem="item"
                   :page_type="type">
+          <!-- 插槽功能 -->
           <div slot="content">
             <span class="is_test_phone" v-if="item.is_share==1">已验证手机号</span>
             <span :class="{'ml10':item.is_share==1}">开奖时间：{{item.lottery_time}}</span>
@@ -19,6 +22,22 @@
           <div slot="bottom">
             <div class="gray"></div>
             <div class="item-control">
+              <!-- cece -->
+               <span v-if="is_homepage">
+              <el-tooltip content="审核"
+                          placement="top"
+                          >
+                <el-button icon="font-icon-check" size="small" circle
+                           @click="checkPerApply(item)"></el-button>
+              </el-tooltip>
+              <el-tooltip content="撤下"
+                          placement="top"
+                          >
+                <el-button icon="font-icon-remove" size="small" circle
+                           @click="removePerApply(item)"></el-button>
+              </el-tooltip>
+               </span>
+
               <el-tooltip content="中奖名单"
                           placement="top">
                 <router-link :to="{name:'data_winnerlist',params:{id:item.id}}"
@@ -128,6 +147,11 @@
       pageTitle: {
         type: String,
         default: ''
+      },
+      //cece
+      is_homepage:{
+        type:String,
+        default:''
       }
     },
     data() {
@@ -150,6 +174,7 @@
       },
       //抽奖活动列表数据
       drawList() {
+        // console.log(this.$store.state.personal)
         return this.$store.state.personal.list
       }
     },

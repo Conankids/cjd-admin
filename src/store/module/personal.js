@@ -21,6 +21,7 @@ const personal = {
       getIndividualList({
         params: search
       }).then(res => {
+        // console.log(res);
         if (res.resultCode === '0') {
           commit('updatePersonalList', res.result)
           commit('updateLoading', false)

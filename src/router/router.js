@@ -134,6 +134,14 @@ const personal = {
       component: () => import('@/pages/personal/individual-draw.vue')
     },
     {
+      path: '/personal/homepage-apply',
+      name: 'homepage-apply',
+      meta: {
+        title: '首页申请'
+      },
+      component: () => import('@/pages/personal/homepage-apply.vue')
+    },
+    {
       path: '/personal/data-statistics/:id',
       name: 'data_statistics',
       hidden: true,

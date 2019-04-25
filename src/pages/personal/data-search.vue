@@ -17,7 +17,15 @@
     </div>
     <div class="list-search-title" v-if="!/(check|timing|down)/.test(page_type)">
       <h3>
-        <a href="javascript:;"
+        <!-- cece -->
+        <a href="javascript:;" v-if="homepage==1"
+            v-for="(item,index) in person_list"
+           :key="index"
+           :class="((index+1)===person_c_type)?'on':''"
+           @click="personChooseType(index,item.status)"
+        >{{item.name}}</a>
+
+         <a href="javascript:;"   v-if="!homepage"
            v-for="(item,index) in status_list"
            :key="index"
            :class="(index===current_type)?'on':''"
@@ -73,7 +81,13 @@
       page_title: {
         type: String,
         default: ''
+      },
+      //cece
+      homepage:{
+        type:String,
+        default:''
       }
+      
     },
     data() {
       return {
@@ -83,12 +97,18 @@
           {name: '已开奖', status: 1},
           {name: '已失效', status: 2}
         ],
+        //cece
+        person_list:[
+          {name: '申请', status: 0},
+          {name: '首页', status: ''},
+        ],
         recen_list: [  //快捷上线时间查询列表
           {name: '今天', status: 1},
           {name: '近3天', status: 3},
           {name: '近7天', status: 7}
         ],
         current_type: 0,  //当前选择的活动状态
+        person_c_type:1,  //cece当前个人抽奖的状态
         meta_title: '', //搜索关键字
         addtime: [],  //搜索时间数组
         order_add_time: false,  //创建时间排序
@@ -97,6 +117,7 @@
         last_days: 0, //快捷上线时间查询
         list_type: '',  //列表状态
         send_status: '',  //上线活动状态
+        person_s_status:'',//cece个人当前个人抽奖上线
         sort_type: 'order_online_time',  //排序类型
         sort_value: 'DESC'  //排序值
       }
@@ -154,9 +175,16 @@
       },
       //切换type
       chooseType(index, status) {
+        console.log(index,status);
         this.current_type = index
         this.send_status = status
         this.initList()
+      },
+      //cece个人抽奖管理
+      personChooseType(index, status){
+        this.person_c_type = index+1
+        this.person_s_status = status
+        console.log(this.person_c_type,this.person_s_status)
       },
       //选择时间
       changeTime(val) {

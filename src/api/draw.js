@@ -150,5 +150,12 @@ export function setSortCode(data = {}) {
   return request(config)
 }
 
-
+//获取个人抽奖活动上首页申请列表 / 个人抽奖活动上首页列表
+export function individualListForHome(data = {}) {
+  const config = Object.assign(data, {
+    method: 'get',
+    url: '/admin/Lotterylist/IndividualListForHome'
+  })
+  return request(config)
+}
 
