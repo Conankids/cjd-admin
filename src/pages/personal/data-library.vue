@@ -23,18 +23,18 @@
             <div class="gray"></div>
             <div class="item-control">
               <!-- cece -->
-               <span v-if="is_homepage">
+               <span v-if="is_homepage==1" class="mr10">
               <el-tooltip content="审核"
                           placement="top"
                           >
                 <el-button icon="font-icon-check" size="small" circle
-                           @click="checkPerApply(item)"></el-button>
+                           @click.prevent="checkPerApply(item)"></el-button>
               </el-tooltip>
               <el-tooltip content="撤下"
                           placement="top"
                           >
                 <el-button icon="font-icon-remove" size="small" circle
-                           @click="removePerApply(item)"></el-button>
+                           @click.prevent="removePerApply(item)"></el-button>
               </el-tooltip>
                </span>
 
@@ -66,6 +66,8 @@
             </div>
           </div>
         </ListItem>
+       
+
         <el-row class="red mt20" v-if="!isLoading && !drawList.data.length">暂时没有活动...</el-row>
       </ul>
       <el-row class="mt30 tc" v-if="drawList && (drawList.count>drawList.size)">
@@ -108,6 +110,32 @@
       </div>
     </el-dialog>
 
+     <!-- 个人抽奖审核页面 -->
+      <el-dialog title="" 
+      :visible.sync="dialogCheck" 
+       width="30%"
+       center>
+        <el-form :model="form">
+          <el-form-item label="">
+            <el-radio-group v-model="form.is_affirm">
+              <el-radio label="1" style="margin-right:200px">同意</el-radio>
+              <el-radio label="2">拒绝</el-radio>
+            </el-radio-group>
+          </el-form-item>
+
+          <el-form-item label="">
+            <el-input type="textarea"
+             v-model="form.desc"
+             :rows="3"
+              placeholder="请输入内容"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+            <el-button type="primary" style="width:140px;" @click="personSendInfo()">提交</el-button>
+        </div>
+      </el-dialog>
+
     <!--删除弹窗-->
     <el-dialog
       class="flex-center"
@@ -134,9 +162,10 @@
 
 <script>
   import {mapActions} from 'vuex'
-  import {online, offline, del, getCode} from '@/api/draw'
+  import {online, offline, del, getCode,deletFromHome,addForHome} from '@/api/draw'
   import ListItem from './datalist-item'
   import Search from './data-search'
+
 
   export default {
     props: {
@@ -164,18 +193,30 @@
         isShowDel: false, //是否显示删除弹窗
         isShowQrcode: false ,//是否显示二维码弹窗
         uid:'',//发布用户id
-        username:''//发布者名字
+        username:'',//发布者名字
+        dialogCheck: false,//审核模板
+        form: {
+          is_affirm: "1",//审核内容
+          desc: "",//审核内容
+        }
       }
     },
     computed: {
       //是否显示加载loading
       isLoading() {
-        return this.$store.state.personal.isLoading
+          return this.$store.state.personal.isLoading
       },
       //抽奖活动列表数据
       drawList() {
-        // console.log(this.$store.state.personal)
         return this.$store.state.personal.list
+      },
+      //是否显示加载loading(个人)      
+      PersonIsLoading() {
+          return this.$store.state.personApply.isLoading
+      },
+      //个人发起抽奖列表数据
+      person_apply_list(){
+        return this.$store.state.personApply.list
       }
     },
     methods: {
@@ -186,6 +227,14 @@
           size: this.drawList.size
         })
         this.$store.dispatch('getPersonalList', data)
+      },
+      personInitList() {
+        //请求列表数据
+        const data = Object.assign(this.person_apply_list.search, {
+          page: this.page,
+          size: this.person_apply_list.size
+        })
+        this.$store.dispatch('personListForHome', data)
       },
       //删除活动(上线弹提示，未上线直接删除)
       delItem(item) {
@@ -316,18 +365,69 @@
         this.isShowDel = false
         this.isKnow = ''
       },
+      //cece审核个人抽奖
+      checkPerApply(item){
+       this.dialogCheck = true;
+      },
+      personSendInfo() {
+        deletFromHome({
+          params:{
+            id:'',
+            agree:'',
+            reason:''
+          }
+        }).then((res)=>{
+            console.log(res)
+            if(res.resultCode==0){
+              this.$message.success(res.errorMsg);
+            }else{
+              this.$message.error(res.errorMsg);
+            }
+           })
+        console.log(this.form);
+        this.dialogCheck = false;
+     },
+      //cece撤下个人抽奖
+      removePerApply(){
+      this.$confirm("确定将抽奖从首页撤下？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          addForHome({
+          params:{
+            id:'',
+          }
+        }).then((res)=>{
+            console.log(res)
+            if(res.resultCode==0){
+              this.$message.success(res.errorMsg);
+            }else{
+              this.$message.error(res.errorMsg);
+            }
+           })
+        })
+        .catch(() => {
+         
+        });
+      },
       //翻页
       handleCurrentChange(val) {
         this.page = val
+        console.log(this.$store.state);
         this.initList()
       },
       ...mapActions([
-        'getPersonalList'
+        'getPersonalList','personListForHome'
       ])
     },
     components: {
       Search,
-      ListItem
+      ListItem,
+    },
+    created(){
+      console.log(this.is_homepage);
     }
   }
 </script>

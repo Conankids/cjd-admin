@@ -1,5 +1,6 @@
 <!--活动列表-->
 <template>
+<div>
   <router-link :to="`/personal/item-detail/${listItem.id}`" target="_blank">
     <li class="item">
       <div class="item-img">
@@ -32,9 +33,12 @@
       </div>
     </li>
   </router-link>
+
+  </div>
 </template>
 
 <script>
+
   export default {
     props: {
       listItem: {
@@ -46,8 +50,13 @@
         default: ''
       }
     },
+    components: {
+    },
     data() {
       return {}
+    },
+    methods:{
+     
     }
   }
 </script>

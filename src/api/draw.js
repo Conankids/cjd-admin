@@ -159,3 +159,20 @@ export function individualListForHome(data = {}) {
   return request(config)
 }
 
+// 个人上首页活动撤下
+export function deletFromHome(data = {}) {
+  const config = Object.assign(data, {
+    method: 'get',
+    url: '/admin/Lotterylist/DeletFromHome'
+  })
+  return request(config)
+}
+
+// 个人上首页审核
+export function addForHome(data = {}) {
+  const config = Object.assign(data, {
+    method: 'get',
+    url: '/admin/Lotterylist/AddForHome'
+  })
+  return request(config)
+}

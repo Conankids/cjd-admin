@@ -22,7 +22,7 @@
             v-for="(item,index) in person_list"
            :key="index"
            :class="((index+1)===person_c_type)?'on':''"
-           @click="personChooseType(index,item.status)"
+           @click="personChooseType(index+1,item.status)"
         >{{item.name}}</a>
 
          <a href="javascript:;"   v-if="!homepage"
@@ -140,6 +140,7 @@
     created() {
       this.list_type = this.page_type
       this.initList()
+      this.personInitList();
     },
     methods: {
       //获取宝贝列表
@@ -173,17 +174,49 @@
         //重置快捷上线时间搜索
         this.last_days = 0
       },
+      //获取首页申请的列表
+      personInitList() {
+        const data = {
+          is_home:this.person_c_type,
+          status: this.status,
+          send_status: this.person_s_status,
+          s_online_time: this.addtime[0],
+          e_online_time: this.addtime[1],
+          meta_title: this.meta_title,
+          last_days: this.last_days
+        }
+        switch (this.sort_type) {
+          case 'order_add_time':
+            Object.assign(data, {
+              order_add_time: this.sort_value
+            })
+            break
+          case 'order_online_time':
+            Object.assign(data, {
+              order_online_time: this.sort_value
+            })
+            break
+          case 'order_lottery_time':
+            Object.assign(data, {
+              order_lottery_time: this.sort_value
+            })
+            break
+        }
+        this.$store.dispatch('personListForHome', data)
+        //重置快捷上线时间搜索
+        this.last_days = 0
+      },
       //切换type
       chooseType(index, status) {
-        console.log(index,status);
         this.current_type = index
         this.send_status = status
         this.initList()
       },
-      //cece个人抽奖管理
+      //cece切换type
       personChooseType(index, status){
-        this.person_c_type = index+1
+        this.person_c_type = index
         this.person_s_status = status
+        this.personInitList();
         console.log(this.person_c_type,this.person_s_status)
       },
       //选择时间
@@ -223,7 +256,7 @@
         this.initList()
       },
       ...mapActions([
-        'getPersonalList'
+        'getPersonalList','personListForHome'
       ])
     }
   }
