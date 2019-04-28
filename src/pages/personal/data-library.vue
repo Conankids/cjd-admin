@@ -515,9 +515,7 @@
   }
 
   .width-con{
-    width: 574px;
-    height: 16px;
-    line-height: 16px;
+    height:20px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

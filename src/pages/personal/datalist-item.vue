@@ -120,4 +120,7 @@
       }
     }
   }
+  .item-desc{
+    width: 55%;
+  }
 </style>
