@@ -1,7 +1,6 @@
 <!--奖品列表-->
 <template>
   <div class="list-wrap">
-    <!-- cece -->
     <Search :page_type="type" :page_title="pageTitle" :homepage="is_homepage"/>
 
     <div class="list-box"
@@ -14,15 +13,17 @@
                   :page_type="type">
           <!-- 插槽功能 -->
           <div slot="content">
+            <div class="width-con">
             <span class="is_test_phone" v-if="item.is_share==1">已验证手机号</span>
             <span :class="{'ml10':item.is_share==1}">开奖时间：{{item.lottery_time}}</span>
             <span class="ml10">发起者：{{item.username}}</span>
             <span class="ml10">uid：{{item.uid}}</span>
+            </div>
           </div>
           <div slot="bottom">
             <div class="gray"></div>
             <div class="item-control">
-              <!-- cece -->
+              <!-- 首页个人页面的操作 -->
                <span v-if="is_homepage" class="mr10">
                 <span v-show="item.is_home==1">
                   <el-tooltip content="审核"
@@ -39,6 +40,15 @@
                             >
                   <el-button icon="font-icon-remove" size="small" circle
                             @click.prevent="removePerApply(item)"></el-button>
+                  </el-tooltip>
+                </span>
+
+                <span class="ml10">
+                  <el-tooltip content="排序值"
+                              placement="top"
+                              >
+                    <el-button icon="font-icon-sort" size="small" circle
+                              @click.prevent="showSortCode(item)"></el-button>
                   </el-tooltip>
                 </span>
 
@@ -168,7 +178,7 @@
 
 <script>
   import {mapActions} from 'vuex'
-  import {online, offline, del, getCode,deletFromHome,addForHome} from '@/api/draw'
+  import {online, offline, del, getCode,deletFromHome,addForHome,setSortCode} from '@/api/draw'
   import ListItem from './datalist-item'
   import Search from './data-search'
 
@@ -391,8 +401,6 @@
      },
       //cece撤下个人抽奖
       removePerApply(item){
-        // console.log(item);
-        // return false;
         this.$confirm("确定将抽奖从首页撤下？", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -415,6 +423,32 @@
           .catch(() => {
           
           });
+      },
+      //个人抽奖排序值
+       showSortCode(item) {
+        this.$prompt('排序值越大越靠前', '设置排序值', {
+          confirmButtonText: '保存',
+          cancelButtonText: '取消',
+          inputPattern: /\d/,
+          inputErrorMessage: '排序值只能是数值',
+          inputValue: item.listorder,
+          inputPlaceholder: '请输入排序值'
+        }).then(({value}) => {
+          setSortCode({
+            params:{
+              id:item.id,
+              listorder:value
+            }
+          }).then(res=>{
+            if(res.resultCode==0){
+              this.$message.success(res.errorMsg)
+              this.initList()
+            }else{
+              this.$message.error(res.errorMsg)
+            }
+          })
+        }).catch(() => {
+        })
       },
       //翻页
       handleCurrentChange(val) {
@@ -478,5 +512,14 @@
     color: #606266;
     background-color: transparent;
     border-color: #dcdfe6;
+  }
+
+  .width-con{
+    width: 574px;
+    height: 16px;
+    line-height: 16px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 </style>

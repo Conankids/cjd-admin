@@ -20,7 +20,10 @@
             </div>
           </div>
           <div class="gray tr">
-            <p>{{listItem.add_time}}</p>
+            <p>
+              <span v-if="listItem.is_home==1||listItem.is_home==2">排序值：{{listItem.listorder}}</span>
+              <span class="ml10">{{listItem.add_time}}</span>
+            </p>
             <p v-if="/(timing)/.test(page_type) && listItem.online_time">定时上线：{{listItem.online_time}}</p>
           </div>
         </div>
@@ -55,8 +58,7 @@
     data() {
       return {}
     },
-    methods:{
-     
+    created(){
     }
   }
 </script>

@@ -11,7 +11,7 @@
   export default {
     data(){
         return{
-           type:"1"
+           type:"1" //传给子组件的是个人申请页面的状态值，便于区分。
         }
     },
     components: {
