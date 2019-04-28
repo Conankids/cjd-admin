@@ -1,3 +1,4 @@
+//vuex  首页申请页面的状态
 import {individualListForHome} from '@/api/draw'
 import {Message} from 'element-ui'
 
@@ -16,22 +17,20 @@ const person_apply = {
   },
   actions: {
     personListForHome({commit}, search) {
-    //   console.log(search);
       commit('updateLoading', true)
       commit('updatePersonalList', [])
       individualListForHome({
         params: search
       }).then(res => {
-        // console.log(res);
-        // if (res.resultCode === '0') {
-        //   commit('updatePersonalList', res.result)
-        //   commit('updateLoading', false)
-        // } else {
-        //   Message({
-        //     type: 'error',
-        //     message: res.errorMsg
-        //   })
-        // }
+        if (res.resultCode === '0') {
+          commit('updatePersonalList', res.result)
+          commit('updateLoading', false)
+        } else {
+          Message({
+            type: 'error',
+            message: res.errorMsg
+          })
+        }
       })
     }
   }

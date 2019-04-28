@@ -23,19 +23,25 @@
             <div class="gray"></div>
             <div class="item-control">
               <!-- cece -->
-               <span v-if="is_homepage==1" class="mr10">
-              <el-tooltip content="审核"
-                          placement="top"
-                          >
-                <el-button icon="font-icon-check" size="small" circle
-                           @click.prevent="checkPerApply(item)"></el-button>
-              </el-tooltip>
-              <el-tooltip content="撤下"
-                          placement="top"
-                          >
-                <el-button icon="font-icon-remove" size="small" circle
-                           @click.prevent="removePerApply(item)"></el-button>
-              </el-tooltip>
+               <span v-if="is_homepage" class="mr10">
+                <span v-show="item.is_home==1">
+                  <el-tooltip content="审核"
+                            placement="top"
+                            >
+                  <el-button icon="font-icon-check" size="small" circle
+                            @click.prevent="checkPerApply(item)"></el-button>
+                </el-tooltip>
+               </span>
+                
+                <span v-show="item.is_home==2">
+                  <el-tooltip content="撤下"
+                            placement="top"
+                            >
+                  <el-button icon="font-icon-remove" size="small" circle
+                            @click.prevent="removePerApply(item)"></el-button>
+                  </el-tooltip>
+                </span>
+
                </span>
 
               <el-tooltip content="中奖名单"
@@ -111,13 +117,13 @@
     </el-dialog>
 
      <!-- 个人抽奖审核页面 -->
-      <el-dialog title="" 
+      <el-dialog title="审核" 
       :visible.sync="dialogCheck" 
        width="30%"
-       center>
-        <el-form :model="form">
+       >
+        <el-form :model="checkForm">
           <el-form-item label="">
-            <el-radio-group v-model="form.is_affirm">
+            <el-radio-group v-model="checkForm.is_affirm">
               <el-radio label="1" style="margin-right:200px">同意</el-radio>
               <el-radio label="2">拒绝</el-radio>
             </el-radio-group>
@@ -125,13 +131,13 @@
 
           <el-form-item label="">
             <el-input type="textarea"
-             v-model="form.desc"
+             v-model="checkForm.desc"
              :rows="3"
               placeholder="请输入内容"
             ></el-input>
           </el-form-item>
         </el-form>
-        <div slot="footer" class="dialog-footer">
+        <div slot="footer" class="dialog-footer" style="text-align:center">
             <el-button type="primary" style="width:140px;" @click="personSendInfo()">提交</el-button>
         </div>
       </el-dialog>
@@ -195,7 +201,8 @@
         uid:'',//发布用户id
         username:'',//发布者名字
         dialogCheck: false,//审核模板
-        form: {
+        checkForm: {
+          id:'',
           is_affirm: "1",//审核内容
           desc: "",//审核内容
         }
@@ -204,39 +211,34 @@
     computed: {
       //是否显示加载loading
       isLoading() {
+        if(this.is_homepage){
+          return this.$store.state.personApply.isLoading         
+        }else{
           return this.$store.state.personal.isLoading
+        }
       },
       //抽奖活动列表数据
       drawList() {
-        return this.$store.state.personal.list
+        if(this.is_homepage){
+          return this.$store.state.personApply.list
+        }else{
+          return this.$store.state.personal.list
+        }
       },
-      //是否显示加载loading(个人)      
-      PersonIsLoading() {
-          return this.$store.state.personApply.isLoading
-      },
-      //个人发起抽奖列表数据
-      person_apply_list(){
-        return this.$store.state.personApply.list
-      }
     },
     methods: {
       initList() {
-        //请求列表数据
-        const data = Object.assign(this.drawList.search, {
-          page: this.page,
-          size: this.drawList.size
-        })
-        this.$store.dispatch('getPersonalList', data)
+          //请求列表数据
+          const data = Object.assign(this.drawList.search, {
+            page: this.page,
+            size: this.drawList.size
+          })
+          if(this.is_homepage){
+            this.$store.dispatch('personListForHome', data)
+          }else{
+            this.$store.dispatch('getPersonalList', data)
+          }
       },
-      personInitList() {
-        //请求列表数据
-        const data = Object.assign(this.person_apply_list.search, {
-          page: this.page,
-          size: this.person_apply_list.size
-        })
-        this.$store.dispatch('personListForHome', data)
-      },
-      //删除活动(上线弹提示，未上线直接删除)
       delItem(item) {
         if (item.status === '1' && item.send_status === '0') {
           this.isShowDel = true
@@ -367,55 +369,56 @@
       },
       //cece审核个人抽奖
       checkPerApply(item){
+       this.checkForm.id=item.id;
        this.dialogCheck = true;
       },
       personSendInfo() {
-        deletFromHome({
+        addForHome({
           params:{
-            id:'',
-            agree:'',
-            reason:''
+            id:this.checkForm.id,
+            agree:this.checkForm.is_affirm,
+            reason:this.checkForm.desc
           }
         }).then((res)=>{
-            console.log(res)
             if(res.resultCode==0){
               this.$message.success(res.errorMsg);
+              this.initList();
             }else{
               this.$message.error(res.errorMsg);
             }
            })
-        console.log(this.form);
         this.dialogCheck = false;
      },
       //cece撤下个人抽奖
-      removePerApply(){
-      this.$confirm("确定将抽奖从首页撤下？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          addForHome({
-          params:{
-            id:'',
-          }
-        }).then((res)=>{
-            console.log(res)
-            if(res.resultCode==0){
-              this.$message.success(res.errorMsg);
-            }else{
-              this.$message.error(res.errorMsg);
-            }
-           })
+      removePerApply(item){
+        // console.log(item);
+        // return false;
+        this.$confirm("确定将抽奖从首页撤下？", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
         })
-        .catch(() => {
-         
-        });
+          .then(() => {
+            deletFromHome({
+            params:{
+              id:item.id,
+            }
+          }).then((res)=>{
+              if(res.resultCode==0){
+                this.$message.success(res.errorMsg);
+                this.initList();
+              }else{
+                this.$message.error(res.errorMsg);
+              }
+            })
+          })
+          .catch(() => {
+          
+          });
       },
       //翻页
       handleCurrentChange(val) {
         this.page = val
-        console.log(this.$store.state);
         this.initList()
       },
       ...mapActions([
@@ -427,7 +430,6 @@
       ListItem,
     },
     created(){
-      console.log(this.is_homepage);
     }
   }
 </script>

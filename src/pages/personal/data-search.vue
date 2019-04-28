@@ -17,8 +17,8 @@
     </div>
     <div class="list-search-title" v-if="!/(check|timing|down)/.test(page_type)">
       <h3>
-        <!-- cece -->
-        <a href="javascript:;" v-if="homepage==1"
+        <!-- cece首页申请 -->
+        <a href="javascript:;" v-if="homepage"
             v-for="(item,index) in person_list"
            :key="index"
            :class="((index+1)===person_c_type)?'on':''"
@@ -82,7 +82,7 @@
         type: String,
         default: ''
       },
-      //cece
+      //cece首页申请
       homepage:{
         type:String,
         default:''
@@ -97,7 +97,7 @@
           {name: '已开奖', status: 1},
           {name: '已失效', status: 2}
         ],
-        //cece
+        //cece首页申请
         person_list:[
           {name: '申请', status: 0},
           {name: '首页', status: ''},
@@ -138,45 +138,44 @@
       }
     },
     created() {
-      this.list_type = this.page_type
       this.initList()
-      this.personInitList();
+      this.list_type = this.page_type
     },
     methods: {
       //获取宝贝列表
-      initList() {
-        const data = {
-          status: this.status,
-          send_status: this.send_status,
-          s_online_time: this.addtime[0],
-          e_online_time: this.addtime[1],
-          meta_title: this.meta_title,
-          last_days: this.last_days
-        }
-        switch (this.sort_type) {
-          case 'order_add_time':
-            Object.assign(data, {
-              order_add_time: this.sort_value
-            })
-            break
-          case 'order_online_time':
-            Object.assign(data, {
-              order_online_time: this.sort_value
-            })
-            break
-          case 'order_lottery_time':
-            Object.assign(data, {
-              order_lottery_time: this.sort_value
-            })
-            break
-        }
-        this.$store.dispatch('getPersonalList', data)
-        //重置快捷上线时间搜索
-        this.last_days = 0
-      },
       //获取首页申请的列表
-      personInitList() {
-        const data = {
+      initList() {
+        if(!this.homepage){
+          const data = {
+            status: this.status,
+            send_status: this.send_status,
+            s_online_time: this.addtime[0],
+            e_online_time: this.addtime[1],
+            meta_title: this.meta_title,
+            last_days: this.last_days
+          }
+          switch (this.sort_type) {
+            case 'order_add_time':
+              Object.assign(data, {
+                order_add_time: this.sort_value
+              })
+              break
+            case 'order_online_time':
+              Object.assign(data, {
+                order_online_time: this.sort_value
+              })
+              break
+            case 'order_lottery_time':
+              Object.assign(data, {
+                order_lottery_time: this.sort_value
+              })
+              break
+          }
+          this.$store.dispatch('getPersonalList', data)
+          //重置快捷上线时间搜索
+          this.last_days = 0
+        }else{
+          const data = {
           is_home:this.person_c_type,
           status: this.status,
           send_status: this.person_s_status,
@@ -184,28 +183,30 @@
           e_online_time: this.addtime[1],
           meta_title: this.meta_title,
           last_days: this.last_days
+          }
+          switch (this.sort_type) {
+            case 'order_add_time':
+              Object.assign(data, {
+                order_add_time: this.sort_value
+              })
+              break
+            case 'order_online_time':
+              Object.assign(data, {
+                order_online_time: this.sort_value
+              })
+              break
+            case 'order_lottery_time':
+              Object.assign(data, {
+                order_lottery_time: this.sort_value
+              })
+              break
+          }
+          this.$store.dispatch('personListForHome', data)
+          //重置快捷上线时间搜索
+          this.last_days = 0
         }
-        switch (this.sort_type) {
-          case 'order_add_time':
-            Object.assign(data, {
-              order_add_time: this.sort_value
-            })
-            break
-          case 'order_online_time':
-            Object.assign(data, {
-              order_online_time: this.sort_value
-            })
-            break
-          case 'order_lottery_time':
-            Object.assign(data, {
-              order_lottery_time: this.sort_value
-            })
-            break
-        }
-        this.$store.dispatch('personListForHome', data)
-        //重置快捷上线时间搜索
-        this.last_days = 0
       },
+      //获取首页申请的列表
       //切换type
       chooseType(index, status) {
         this.current_type = index
@@ -215,16 +216,16 @@
       //cece切换type
       personChooseType(index, status){
         this.person_c_type = index
-        this.person_s_status = status
-        this.personInitList();
-        console.log(this.person_c_type,this.person_s_status)
+        // this.person_s_status = status
+        // console.log(this.person_c_type,this.person_s_status)
+        this.initList();
       },
       //选择时间
       changeTime(val) {
         if (!val) {
           this.addtime = []
         }
-        this.initList()
+          this.initList()
       },
       //时间快捷按钮
       chooseTime(status) {
