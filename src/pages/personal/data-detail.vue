@@ -1,7 +1,7 @@
 <!--数据概况-->
 <template>
   <div class="draw-statistics" >
-    <el-row class="Z-row detail-list">
+    <el-row class="Z-row detail-list"  style="min-height:400px" v-loading="loading">
       <div class="detail-item" v-for="(item,index) in statistics" :key="index">
         <h4>{{item.num}}</h4>
         <p>{{item.text}}</p>
@@ -24,7 +24,8 @@
   export default {
     data() {
       return {
-        data: null
+        data: null,
+        loading:false
       }
     },
     computed: {
@@ -94,9 +95,11 @@
         const params = {
           id: this.$route.params.id
         }
+        this.loading=true;
         getData({
           params: params
         }).then(res => {
+          this.loading=false;
           if (res.resultCode === '0') {
             this.data = res.result
           } else {

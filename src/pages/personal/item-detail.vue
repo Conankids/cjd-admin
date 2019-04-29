@@ -1,6 +1,7 @@
 <!--奖品详情-->
 <template>
-  <div class="itemWrap" v-if="formData" v-loading="initLoading">
+<div v-loading="initLoading" style="min-height:500px">
+  <div class="itemWrap" v-if="formData">
     <div class="itemDesc">
       <div class="itemPic">
         <img :src="`http://s1.jiguo.com/${formData.cover}`" alt="">
@@ -8,7 +9,7 @@
       <div class="itemText">
         <div class="text" v-for="item in formData.meta_list">
           <span class="ft20 fc">{{item.title}}</span>
-          <span class="ft16 ml300"><strong>奖品数量：{{item.num}}</strong></span>
+          <span class="ft16"><strong>奖品数量：{{item.num}}</strong></span>
         </div>
       </div>
     </div>
@@ -46,6 +47,8 @@
       </div>
     </div>
   </div>
+</div>
+
 </template>
 
 <script>
@@ -83,16 +86,8 @@
 </script>
 
 <style lang="less">
-  .itemWrap {
-    min-height: 500px;
-  }
-
   .itemDesc {
     width: 100%;
-  }
-
-  .ml300 {
-    margin-left: 300px;
   }
 
   .text {
@@ -100,6 +95,9 @@
     height: 40px;
     line-height: 40px;
     margin-bottom: 40px;
+    display: flex;
+    justify-content:space-between;
+    align-content: center;
   }
 
   .itemPic {
