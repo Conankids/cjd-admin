@@ -14,6 +14,7 @@ export const router = new Router({
   routes: routes
 })
 
+console.log(Cookies());
 router.beforeEach((to, from, next) => {
   NProgress.start()
   Util.title(to.meta.title)
