@@ -30,6 +30,14 @@
               ticket_code_desc: ''
             }
           ],
+          recommend_wxcode:[
+            {
+              sponsor_wxcode_name:'',
+              sponsor_btn_name:'',
+              sponsor_wxcode_url:'',
+              cover:''
+            }
+          ],
           cover: '',
           imgs: [],
           popularity_award: 2,

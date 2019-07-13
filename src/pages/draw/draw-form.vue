@@ -7,7 +7,7 @@
     label-position="left"
     v-loading="isEdit && !isInit"
     element-loading-text="拼命加载中">
-
+    <p @click="test()">点击查看</p>
     <!--抽奖类型设置-->
     <el-form-item>
       <div class="typeSet">
@@ -70,6 +70,86 @@
         </el-upload>
       </div>
     </el-form-item>
+
+    <!-- 小程序推荐设置-->
+    <!-- <div class="awardTitle ft20">
+      <strong>小程序推荐</strong>
+    </div> -->
+    <div class="wx-system" style="margin-bottom:100px">
+      <el-row class="ft16">小程序设置：</el-row>
+      <el-row class="table-header">
+        <div style="width: 220px;">选择小程序</div>
+        <div style="width: 200px;">页面地址</div>
+        <div style="width: 150px;">按钮名称</div>
+        <div style="width: 200px;">封面图：建议尺寸640x400</div>
+      </el-row>
+
+      <!-- 判断是否是上线 -->
+    <!-- <div v-if="isEdit && formData.status!=='0'"> -->
+        <div>
+      <el-row class="award-item" v-for="(item,index) in info.recommend_wxcode" :key="index">        
+        <el-select v-model="item.sponsor_wxcode_name" 
+          placeholder="请选择小程序"
+          class="w200 iblock"
+          size="mini"
+          >
+          <el-option
+              v-for="item in options.sponsor_wxcode_list"
+              :key="item.id"
+              :label="item.wxcode_name"
+              :value="item.id">
+          </el-option>
+        </el-select>
+
+        <el-form-item class="iblock ml10"
+                      size="mini"
+                      >
+          <el-input class="w180" v-model="item.sponsor_btn_name" type="text"></el-input>
+        </el-form-item>
+
+        <el-form-item class="iblock ml10"
+                      size="mini"
+        >
+          <el-input class="w180" v-model="item.sponsor_wxcode_url" type="text"></el-input>
+        </el-form-item>
+
+        <!-- 上传文件 -->
+        <el-form-item class="iblock ml50 w200"
+                      size="mini"
+          >
+         <el-upload
+            class="upload-demo"
+            action="/admin/Lotterylist/UploadImg"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            list-type="picture"
+            accept="image/*"
+            :multiple="true"
+            :limit="1"
+            :show-file-list="false"
+            :before-upload="uploadBannerBefore"
+            :on-exceed="uploadBannerExceed"
+            :on-error="uploadBannerError"
+            :on-success="uploadBannerSuccess">
+            <span class="blue">选择文件</span>
+          </el-upload>
+        </el-form-item>
+
+        <div class="iblock icon-del"
+             v-if="(info.recommend_wxcode.length>1) || (info.recommend_wxcode.length>2)"
+             @click="delWxList(index)"></div>
+        <div class="iblock blue cp icon-add"
+            v-if="isAddShow(index)"
+             @click="addWxList()">&nbsp;
+        </div>
+      </el-row>
+    </div>
+
+    <!-- </div> -->
+
+    </div>
+    <!-- 小程序推荐设置-->
+
 
     <el-row class="ft16">奖品设置：</el-row>
     <el-row class="table-header">
@@ -549,6 +629,15 @@
     }
   }
 
+  const WX_SYITEM=function(){
+    return{
+      sponsor_wxcode_name:'',
+      sponsor_btn_name:'',
+      sponsor_wxcode_url:'',
+      cover:''
+    }
+  }
+
   export default {
     props: {
       url: {
@@ -646,7 +735,8 @@
           is_team: '0', //是否组队
           team_num: '2',  //组队人数
           apply_condition_num: '',  //参与条件里限制的抽奖次数
-          apply_condition_tips: ''  //参与条件文案
+          apply_condition_tips: '',  //参与条件文案
+          recommend_wxcode:[],//小程序的推荐列表
         },
         rules: {
           detail: [
@@ -714,10 +804,14 @@
       window.onscroll = null
     },
     methods: {
+      test(){
+        console.log(this.info.meta_list);
+      },
       //获取赞助商小程序列表
       initWxcodeList() {
         getWxcodeList().then(res => {
           if (res.resultCode === '0') {
+            // console.log(res);
             this.options.sponsor_wxcode_list = res.result.data
             if (!this.isEdit) {
               this.info.sponsor_wxcode_id = this.options.sponsor_wxcode_list[0].id
@@ -858,10 +952,29 @@
       //添加奖项
       addAward() {
         this.info.meta_list.push(AWARD_ITEM.call(this, 1))
+        console.log(this.info.meta_list);
       },
       //删除奖项
       delAward(index) {
         this.info.meta_list.splice(index, 1)
+        console.log(this.info.meta_list);
+      },
+       //添加小程序
+      addWxList() {
+        this.info.recommend_wxcode.push(WX_SYITEM.call(this, 1))
+        console.log(this.info.recommend_wxcode);
+      },
+      //删除小程序
+      delWxList(index) {
+        this.info.recommend_wxcode.splice(index, 1)
+        console.log(this.info.recommend_wxcode);
+      },
+      // 上传数据
+      handleRemove(file, fileList) {
+        console.log(file, fileList);
+      },
+      handlePreview(file) {
+        console.log(file);
       },
       //人气奖开关变化
       changePopularity(val) {
@@ -874,7 +987,7 @@
           })
         }
       },
-      //是否显示添加奖项按钮
+      //是否显示添加奖项按钮(小程序列表按钮)
       isShowAddBtn(index) {
         const meta_list = this.info.meta_list
         if (this.info.popularity_award == 2) {
@@ -890,6 +1003,14 @@
             return false
           }
         }
+      },
+      isAddShow(index){//是否添加小程序推荐的列表
+        const recommend_wxcode = this.info.recommend_wxcode
+        if (!((index !== recommend_wxcode.length - 1) || (recommend_wxcode.length > 1))) {
+            return true
+          } else {
+            return false
+          }
       },
       //复制成功回调
       onCopy() {
@@ -924,6 +1045,7 @@
             }
             //第一张产品默认为封面图
             this.info.cover = this.info.imgs[0]
+            console.log(this.info.cover);
             this.info.apply_condition_tips = this.apply_condition_tips
             this.info.sponsor_wxcode_name = this.sponsor_wxcode_name
             this.isSending = true

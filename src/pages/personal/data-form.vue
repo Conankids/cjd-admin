@@ -268,6 +268,7 @@
                    @click="submit('form')">提交
         </el-button>
       </el-form-item>
+
     </div>
 
     <!--小程序二维码-->
@@ -570,6 +571,7 @@
         this.$message.error('复制失败')
       },
       submit(formName) {
+        console.log(this.url);
         //提交
         this.$refs[formName].validate((valid) => {
           if (valid) {
@@ -588,6 +590,8 @@
             }).then(res => {
               this.isSending = false
               if (res.resultCode === '0') {
+                console.log(res);
+                console.log(this.url);
                 this.$message.success('提交成功')
                 const _this = this
                 setTimeout(function () {

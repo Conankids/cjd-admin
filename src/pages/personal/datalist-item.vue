@@ -29,9 +29,13 @@
         </div>
         <div class="flex-between mt10">
           <div class="item-desc gray ft12" >
+            <!-- //插槽功能 -->
             <slot name="content"></slot>
+
           </div>
+            <!-- //插槽功能 -->
           <slot name="bottom"></slot>
+
         </div>
       </div>
     </li>

@@ -24,6 +24,16 @@
             <div class="gray"></div>
             <div class="item-control">
               <!-- 首页个人页面的操作 -->
+              <span class="mr10" v-if="!item.is_deposit==1">
+                  <el-tooltip content="押金"
+                            placement="top"
+                            >
+                  <el-button icon="font-icon-money" size="small" circle
+                            :style="{'background':item.is_deposit=='2'?'red':'gray'}"
+                            @click.prevent="deposiReturn(item)"></el-button>
+                  </el-tooltip>
+                </span>
+                
                <span v-if="is_homepage" class="mr10">
                 <span v-show="item.is_home==1">
                   <el-tooltip content="审核"
@@ -151,6 +161,22 @@
             <el-button type="primary" style="width:140px;" @click="personSendInfo()">提交</el-button>
         </div>
       </el-dialog>
+      
+    <!-- 退押金弹窗 -->
+    <el-dialog
+      title=""
+      :visible.sync="isReturnMoney"
+      width="30%"
+      center>
+      <div class="return-money ft20 b">
+        <span>退押金</span>
+        <span>499</span>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="isReturnMoney = false">退 还</el-button>
+        <el-button @click="isReturnMoney = false">取 消</el-button>
+      </span>
+    </el-dialog>
 
     <!--删除弹窗-->
     <el-dialog
@@ -173,6 +199,7 @@
         <el-button @click="closeDelLayer">取 消</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -207,10 +234,12 @@
         wxcode_url: '',  //小程序路径
         isKnow: false,  //删除弹窗是否知道
         isShowDel: false, //是否显示删除弹窗
+        isReturnMoney:false,//是否退押金弹窗
         isShowQrcode: false ,//是否显示二维码弹窗
         uid:'',//发布用户id
         username:'',//发布者名字
         dialogCheck: false,//审核模板
+        depositMoney:'',
         checkForm: {
           id:'',
           is_affirm: "1",//审核内容
@@ -399,6 +428,12 @@
            })
         this.dialogCheck = false;
      },
+      //cece退押金
+      deposiReturn(item){
+        // is_deposit
+        console.log(item);
+        this.isReturnMoney=true
+      },
       //cece撤下个人抽奖
       removePerApply(item){
         this.$confirm("确定将抽奖从首页撤下？", "提示", {
@@ -519,5 +554,9 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  .return-money{
+    display: flex;
+    justify-content: space-between;
   }
 </style>
