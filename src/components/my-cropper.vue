@@ -38,13 +38,24 @@
       cropperData: {
         type: Object,
         default: null
+      },
+      isWxUpload:{
+        type:String,
+        default:''
+      }
+    },
+    created(){
+    },
+    watch:{
+      isWxUpload:function(newValue,oldValue){
+        console.log(newValue);
       }
     },
     data() {
       return {
         isUpload: false,
         cropper: {},
-        updateData: {}
+        updateData: {},
       }
     },
     methods: {
@@ -80,10 +91,15 @@
           upLoadPic({
             data: data
           }).then(res => {
+            console.log(this.isWxUpload)
             this.isUpload = false
             if (res.resultCode === 0) {
               this.updateData = res.result.fileid
-              this.$emit('updateImg', this.updateData)
+              if(this.isWxUpload==1){
+                this.$emit('updataWxImg',this.updateData)
+              }else{
+                this.$emit('updateImg', this.updateData)
+              }
               this.$emit('update:isShow', false)
             } else {
               this.$message.error(res.errorMsg)

@@ -7,7 +7,7 @@
     label-position="left"
     v-loading="isEdit && !isInit"
     element-loading-text="拼命加载中">
-    <p @click="test()">点击查看</p>
+    <!-- <p @click="test()">点击查看</p> -->
     <!--抽奖类型设置-->
     <el-form-item>
       <div class="typeSet">
@@ -72,67 +72,80 @@
     </el-form-item>
 
     <!-- 小程序推荐设置-->
-    <!-- <div class="awardTitle ft20">
-      <strong>小程序推荐</strong>
-    </div> -->
-    <div class="wx-system" style="margin-bottom:100px">
+    <div class="wx-system" v-if="info.recommend_wxcode&&info.recommend_wxcode.length>0">
       <el-row class="ft16">小程序设置：</el-row>
       <el-row class="table-header">
         <div style="width: 220px;">选择小程序</div>
-        <div style="width: 200px;">页面地址</div>
+        <div style="width: 200px;" class="ml20">页面地址</div>
         <div style="width: 150px;">按钮名称</div>
-        <div style="width: 200px;">封面图：建议尺寸640x400</div>
+        <div style="width: 200px;" class="ml30">封面图：建议尺寸640x400</div>
       </el-row>
-
-      <!-- 判断是否是上线 -->
-    <!-- <div v-if="isEdit && formData.status!=='0'"> -->
-        <div>
-      <el-row class="award-item" v-for="(item,index) in info.recommend_wxcode" :key="index">        
+      <!-- 添加判断区域 -->
+    <div class="wx-wrappper">
+      <el-row class="wx-content" v-for="(item,index) in info.recommend_wxcode" :key="index">
+        <el-form-item class="iblock"
+                      size="mini"
+                      >
         <el-select v-model="item.sponsor_wxcode_name" 
           placeholder="请选择小程序"
           class="w200 iblock"
           size="mini"
+          @change="((val)=>{getWxValue(val, index)})"
           >
           <el-option
               v-for="item in options.sponsor_wxcode_list"
               :key="item.id"
               :label="item.wxcode_name"
-              :value="item.id">
+              :value="item.wxcode_name">
           </el-option>
         </el-select>
-
+        </el-form-item>
         <el-form-item class="iblock ml10"
                       size="mini"
                       >
-          <el-input class="w180" v-model="item.sponsor_btn_name" type="text"></el-input>
+          <el-input class="w180" v-model="item.sponsor_wxcode_url" type="text"></el-input>
         </el-form-item>
 
         <el-form-item class="iblock ml10"
                       size="mini"
         >
-          <el-input class="w180" v-model="item.sponsor_wxcode_url" type="text"></el-input>
+          <el-input class="w180"  v-model="item.sponsor_btn_name" type="text"></el-input>
         </el-form-item>
 
         <!-- 上传文件 -->
-        <el-form-item class="iblock ml50 w200"
+        <el-form-item class="iblock ml45 mr10 w200"
                       size="mini"
-          >
-         <el-upload
-            class="upload-demo"
-            action="/admin/Lotterylist/UploadImg"
-            :on-preview="handlePreview"
-            :on-remove="handleRemove"
-            list-type="picture"
-            accept="image/*"
-            :multiple="true"
-            :limit="1"
-            :show-file-list="false"
-            :before-upload="uploadBannerBefore"
-            :on-exceed="uploadBannerExceed"
-            :on-error="uploadBannerError"
-            :on-success="uploadBannerSuccess">
-            <span class="blue">选择文件</span>
-          </el-upload>
+        >
+        <!--上传-->
+        <div class="product-pic-list" >
+        <div class="image" v-if="item.cover">
+          <div class="deal-wrap">
+            <i class="font-icon-crop deal-item" title="裁剪" @click="wxCrop(index)"></i>
+            <i class="el-icon-delete deal-item" title="删除" @click="wxDelImg(index)"></i>
+          </div>
+          <i class="el-icon-loading" v-if="typeof item.cover != 'string'"></i>
+          <img v-else
+               :src="`http://s1.jiguo.com/${item.cover}/640`"
+               alt="">
+        </div>
+
+        <!--上传-->
+        <el-upload
+          class=""
+          action="/admin/Lotterylist/UploadImg"
+          accept="image/*"
+          :show-file-list="false"
+          :before-upload="uploadWxBefore"
+          :on-error="uploadWxError"
+          :on-success="uploadWxSuccess">
+          <div class="cover"
+           v-if="!item.cover"
+           @click="getIndex(index)">
+            <i class="el-icon-plus"></i>
+            <span>添加图片</span>
+          </div>
+        </el-upload>
+      </div>
         </el-form-item>
 
         <div class="iblock icon-del"
@@ -140,14 +153,13 @@
              @click="delWxList(index)"></div>
         <div class="iblock blue cp icon-add"
             v-if="isAddShow(index)"
-             @click="addWxList()">&nbsp;
+             @click="addWxList(index)">&nbsp;
         </div>
       </el-row>
     </div>
 
-    <!-- </div> -->
-
     </div>
+
     <!-- 小程序推荐设置-->
 
 
@@ -601,7 +613,7 @@
       </div>
     </el-dialog>
 
-    <MyCropper :isShow.sync="showCropper" :cropperData="cropperData" @updateImg="updateImg"/>
+    <MyCropper :isShow.sync="showCropper" :isWxUpload="isWxUpload" :cropperData="cropperData" @updateImg="updateImg" @updataWxImg="updataWxImg"/>
   </el-form>
 </template>
 
@@ -634,7 +646,8 @@
       sponsor_wxcode_name:'',
       sponsor_btn_name:'',
       sponsor_wxcode_url:'',
-      cover:''
+      cover:'',
+      appid:''
     }
   }
 
@@ -698,6 +711,11 @@
         }
       }
       return {
+        //ceshi
+        // 获取点击的上传文件的列表
+        uploadImgIndex:'',
+        isWxUpload:'',
+        //ceshi
         title_rule: title_rule, //奖品名称校验
         num_rule: num_rule,  //奖品数量校验
         // price_rule:price_rule,//价格校验
@@ -805,13 +823,28 @@
     },
     methods: {
       test(){
-        console.log(this.info.meta_list);
+        // console.log( this.info.recommend_wxcode);
+        // let en=qs.stringify(this.info.recommend_wxcode)
+        // console.log(en);
+      },
+      // 获取图片所在列表的索引值
+      getIndex(index){
+        this.uploadImgIndex=index;
+      },
+      //获取小程序列表信息的appid
+      getWxValue(value,index){
+        // console.log(value);
+        let appid=this.options.sponsor_wxcode_list.filter(item=>{
+          if(item.wxcode_name==value){
+            return item
+          }
+        })
+        this.info.recommend_wxcode[index].appid=appid[0].wxcode_appid;
       },
       //获取赞助商小程序列表
       initWxcodeList() {
         getWxcodeList().then(res => {
           if (res.resultCode === '0') {
-            // console.log(res);
             this.options.sponsor_wxcode_list = res.result.data
             if (!this.isEdit) {
               this.info.sponsor_wxcode_id = this.options.sponsor_wxcode_list[0].id
@@ -879,10 +912,33 @@
         this.info.imgs.forEach((t, i, arr) => {
           typeof t == 'object' && t.uid == file.uid && arr.splice(i, 1, response.result.fileid)
         })
+        // console.log(this.info.imgs)
       },
       uploadBannerError() {
         this.$message.error('上传失败')
         this.cover_loading = false
+      },
+      uploadWxBefore(file){
+         if (file.size > FILE_LIMIT_SIZE) {
+          this.$message.error('上传文件不能超过2MB')
+          return false
+        }
+        this.info.recommend_wxcode[this.uploadImgIndex].cover=file.uid;
+      },
+      uploadWxSuccess(response, file, fileList){
+         //图片上传成功后的数据处理
+        if (response.resultCode==0.) {
+          this.info.recommend_wxcode[this.uploadImgIndex].cover=response.result.fileid
+        }else{
+          this.$message.error(response.errorMsg)
+          return
+        }
+      },
+      uploadWxExceed(){
+        this.$message.error('最多只能上传1张推荐图片')
+      },
+      uploadWxError(){
+        this.$message.error('上传失败')
       },
       //图片裁剪
       crop(i) {
@@ -893,11 +949,31 @@
       },
       //裁剪后更新图片
       updateImg(cropData) {
+        console.log(cropData);
         this.info.imgs.splice(this.cropperData.idx, 1, cropData)
       },
       //删除产品图片
       delImg(i) {
         this.info.imgs.splice(i, 1)
+      },
+      //微信推荐图片裁剪
+      wxCrop(i) {
+        this.isWxUpload="1";
+        this.cropperData.url = `http://s1.jiguo.com/${this.info.recommend_wxcode[i].cover}`
+        this.cropperData.idx = i
+        this.cropperData.ratio = 2
+        this.showCropper = true
+      },
+       //裁剪后更新图片
+      updataWxImg(cropData) {
+        console.log(cropData)
+        this.info.recommend_wxcode[this.cropperData.idx].cover=cropData;
+      },
+      //删除产品图片
+      wxDelImg(i) {
+        // console.log(i)
+        this.info.recommend_wxcode[i].cover="";
+        // console.log(this.info.recommend_wxcode[i]);
       },
       //编辑时lottery_type转化为文字
       lottery_type_text(val) {
@@ -952,29 +1028,22 @@
       //添加奖项
       addAward() {
         this.info.meta_list.push(AWARD_ITEM.call(this, 1))
-        console.log(this.info.meta_list);
+        // console.log(this.info.meta_list);
       },
       //删除奖项
       delAward(index) {
         this.info.meta_list.splice(index, 1)
-        console.log(this.info.meta_list);
+        // console.log(this.info.meta_list);
       },
        //添加小程序
-      addWxList() {
+      addWxList(index) {
         this.info.recommend_wxcode.push(WX_SYITEM.call(this, 1))
-        console.log(this.info.recommend_wxcode);
+        // console.log(this.info.recommend_wxcode);
       },
       //删除小程序
       delWxList(index) {
         this.info.recommend_wxcode.splice(index, 1)
-        console.log(this.info.recommend_wxcode);
-      },
-      // 上传数据
-      handleRemove(file, fileList) {
-        console.log(file, fileList);
-      },
-      handlePreview(file) {
-        console.log(file);
+        // console.log(this.info.recommend_wxcode);
       },
       //人气奖开关变化
       changePopularity(val) {
@@ -1041,19 +1110,19 @@
               })
               info_meta_list.splice(popularity_award_idx, 1)
               info_meta_list.push(popularity_award)
-              console.log(info_meta_list)
             }
             //第一张产品默认为封面图
             this.info.cover = this.info.imgs[0]
-            console.log(this.info.cover);
+            // console.log(this.info.cover);
             this.info.apply_condition_tips = this.apply_condition_tips
             this.info.sponsor_wxcode_name = this.sponsor_wxcode_name
             this.isSending = true
+            console.log(this.info);
             subEvent({
               url: this.url,
               data: qs.stringify({
                 info: this.info,
-                info_meta_list: info_meta_list
+                info_meta_list: info_meta_list,
               })
             }).then(res => {
               this.isSending = false
@@ -1379,5 +1448,24 @@
       }
     }
   }
-
+  .wx-wrappper{
+    margin-bottom:20px; 
+    .wx-content{
+      height: 120px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid #dcdfe6;
+    }
+    .product-pic-list{
+      padding: 0;
+      margin-top:15px;
+      width: 200px;
+      height: 100px;
+      .image{
+         padding: 0;
+         margin: 0;
+      }
+    }
+  }
 </style>

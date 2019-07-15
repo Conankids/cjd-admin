@@ -27,6 +27,7 @@
         }).then(res => {
           if (res.resultCode === '0') {
             this.formData = res.result
+            console.log(this.formData);
           }
         })
       }
