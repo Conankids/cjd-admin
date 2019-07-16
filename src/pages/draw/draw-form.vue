@@ -714,7 +714,7 @@
         //ceshi
         // 获取点击的上传文件的列表
         uploadImgIndex:'',
-        isWxUpload:'',
+        isWxUpload:false,
         //ceshi
         title_rule: title_rule, //奖品名称校验
         num_rule: num_rule,  //奖品数量校验
@@ -942,6 +942,7 @@
       },
       //图片裁剪
       crop(i) {
+        this.isWxUpload=false;
         this.cropperData.url = `http://s1.jiguo.com/${this.info.imgs[i]}`
         this.cropperData.idx = i
         this.cropperData.ratio = 2
@@ -958,7 +959,7 @@
       },
       //微信推荐图片裁剪
       wxCrop(i) {
-        this.isWxUpload="1";
+        this.isWxUpload=true;
         this.cropperData.url = `http://s1.jiguo.com/${this.info.recommend_wxcode[i].cover}`
         this.cropperData.idx = i
         this.cropperData.ratio = 2

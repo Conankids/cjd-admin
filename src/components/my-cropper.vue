@@ -40,7 +40,7 @@
         default: null
       },
       isWxUpload:{
-        type:String,
+        type:Boolean,
         default:''
       }
     },
@@ -95,7 +95,7 @@
             this.isUpload = false
             if (res.resultCode === 0) {
               this.updateData = res.result.fileid
-              if(this.isWxUpload==1){
+              if(this.isWxUpload){
                 this.$emit('updataWxImg',this.updateData)
               }else{
                 this.$emit('updateImg', this.updateData)
