@@ -176,3 +176,13 @@ export function addForHome(data = {}) {
   })
   return request(config)
 }
+
+
+// 退押金
+export function orderRefund(data = {}) {
+  const config = Object.assign(data, {
+    method: 'post',
+    url: '/admin/order/Refund'
+  })
+  return request(config)
+}

@@ -7,7 +7,6 @@
     label-position="left"
     v-loading="isEdit && !isInit"
     element-loading-text="拼命加载中">
-    <!-- <p @click="test()">点击查看</p> -->
     <!--抽奖类型设置-->
     <el-form-item>
       <div class="typeSet">
@@ -71,9 +70,12 @@
       </div>
     </el-form-item>
 
+    <el-row class="ft16" :class="{mb20:isAddState}">小程序设置：
+          <span class="iblock blue cp icon-add" v-show="isAddState" @click="addWxList()"></span>
+    </el-row>
     <!-- 小程序推荐设置-->
     <div class="wx-system" v-if="info.recommend_wxcode&&info.recommend_wxcode.length>0">
-      <el-row class="ft16">小程序设置：</el-row>
+    <!-- <div class="wx-system"> -->  
       <el-row class="table-header">
         <div style="width: 220px;">选择小程序</div>
         <div style="width: 200px;" class="ml20">页面地址</div>
@@ -149,11 +151,11 @@
         </el-form-item>
 
         <div class="iblock icon-del"
-             v-if="(info.recommend_wxcode.length>1) || (info.recommend_wxcode.length>2)"
+             v-if="(info.recommend_wxcode.length>=1)"
              @click="delWxList(index)"></div>
         <div class="iblock blue cp icon-add"
             v-if="isAddShow(index)"
-             @click="addWxList(index)">&nbsp;
+             @click="addWxList()">&nbsp;
         </div>
       </el-row>
     </div>
@@ -789,6 +791,14 @@
       }
     },
     computed: {
+      //写一个返回推荐小程序的计算属性
+      isAddState(){
+        if(this.info.recommend_wxcode.length>0){
+          return false;
+        }else{
+          return true;
+        }
+      },
       sponsor_wxcode_name() {
         for (let val of this.options.sponsor_wxcode_list) {
           if (this.info.sponsor_wxcode_id === val.id) {
@@ -822,11 +832,6 @@
       window.onscroll = null
     },
     methods: {
-      test(){
-        // console.log( this.info.recommend_wxcode);
-        // let en=qs.stringify(this.info.recommend_wxcode)
-        // console.log(en);
-      },
       // 获取图片所在列表的索引值
       getIndex(index){
         this.uploadImgIndex=index;
@@ -857,8 +862,12 @@
       },
       //初始化form信息
       initFormData() {
+        console.log(this.formData)
         for (let i in this.info) {
           this.info[i] = this.formData[i]
+        }
+        if(!this.formData.recommend_wxcode){
+          this.info.recommend_wxcode=[];
         }
         this.info.id = this.formData.id
         if (this.info.apply_condition === '2') {
@@ -1036,8 +1045,8 @@
         this.info.meta_list.splice(index, 1)
         // console.log(this.info.meta_list);
       },
-       //添加小程序
-      addWxList(index) {
+      //添加小程序
+      addWxList() {
         this.info.recommend_wxcode.push(WX_SYITEM.call(this, 1))
         // console.log(this.info.recommend_wxcode);
       },

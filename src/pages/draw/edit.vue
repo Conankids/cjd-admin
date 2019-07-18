@@ -25,9 +25,10 @@
         getInfo({
           params: params
         }).then(res => {
+          // console.log(res);
           if (res.resultCode === '0') {
             this.formData = res.result
-            console.log(this.formData);
+            // console.log(this.formData);
           }
         })
       }

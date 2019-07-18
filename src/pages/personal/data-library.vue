@@ -23,13 +23,13 @@
           <div slot="bottom">
             <div class="gray"></div>
             <div class="item-control">
-              <!-- 首页个人页面的操作 -->
-              <span class="mr10" v-if="!item.is_deposit==1">
-                  <el-tooltip content="押金"
+              <span class="mr10" v-if="item.is_deposit!=1">
+                  <el-tooltip 
+                            :content="item.is_deposit=='2'?'押金已交':'押金已退'"
                             placement="top"
                             >
-                  <el-button icon="font-icon-money" size="small" circle
-                            :style="{'background':item.is_deposit=='2'?'red':'gray'}"
+                  <el-button icon="font-icon-money" size="mini" circle
+                            :type="item.is_deposit=='2'?'danger':'info'"
                             @click.prevent="deposiReturn(item)"></el-button>
                   </el-tooltip>
                 </span>
@@ -39,7 +39,7 @@
                   <el-tooltip content="审核"
                             placement="top"
                             >
-                  <el-button icon="font-icon-check" size="small" circle
+                  <el-button icon="font-icon-check" size="mini" circle
                             @click.prevent="checkPerApply(item)"></el-button>
                 </el-tooltip>
                </span>
@@ -48,7 +48,7 @@
                   <el-tooltip content="撤下"
                             placement="top"
                             >
-                  <el-button icon="font-icon-remove" size="small" circle
+                  <el-button icon="font-icon-remove" size="mini" circle
                             @click.prevent="removePerApply(item)"></el-button>
                   </el-tooltip>
                 </span>
@@ -57,7 +57,7 @@
                   <el-tooltip content="排序值"
                               placement="top"
                               >
-                    <el-button icon="font-icon-sort" size="small" circle
+                    <el-button icon="font-icon-sort" size="mini" circle
                               @click.prevent="showSortCode(item)"></el-button>
                   </el-tooltip>
                 </span>
@@ -68,25 +68,25 @@
                           placement="top">
                 <router-link :to="{name:'data_winnerlist',params:{id:item.id}}"
                              target="_blank">
-                  <el-button icon="font-icon-user-list" size="small" circle></el-button>
+                  <el-button icon="font-icon-user-list" size="mini" circle></el-button>
                 </router-link>
               </el-tooltip>
               <el-tooltip content="活动数据"
                           placement="top">
                 <router-link :to="{name:'data_statistics',params:{id:item.id}}"
                              target="_blank">
-                  <el-button icon="font-icon-Statistics" size="small" circle></el-button>
+                  <el-button icon="font-icon-Statistics" size="mini" circle></el-button>
                 </router-link>
               </el-tooltip>
               <el-tooltip content="小程序码"
                           placement="top"
                           >
-                <el-button icon="font-icon-qrcode" size="small" circle
+                <el-button icon="font-icon-qrcode" size="mini" circle
                            @click.prevent="showCode(item)"></el-button>
               </el-tooltip>
               <el-tooltip content="删除"
                           placement="top">
-                <el-button icon="el-icon-close" size="small" circle
+                <el-button icon="el-icon-close" size="mini" circle
                            @click.prevent="delItem(item)"></el-button>
               </el-tooltip>
             </div>
@@ -164,17 +164,17 @@
       
     <!-- 退押金弹窗 -->
     <el-dialog
-      title=""
-      :visible.sync="isReturnMoney"
+      title="退押金"
+      :visible.sync="isReturnMoneyDir"
       width="30%"
-      center>
-      <div class="return-money ft20 b">
-        <span>退押金</span>
-        <span>499</span>
+      >
+      <div class="return-money ft18 b">
+        <span>金额：</span>
+        <span>￥{{deposit_info.deposit_price}}</span>
       </div>
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="isReturnMoney = false">退 还</el-button>
-        <el-button @click="isReturnMoney = false">取 消</el-button>
+        <el-button type="primary" @click="returnMoney(deposit_info.id)">退 还</el-button>
+        <el-button @click="isReturnMoneyDir = false">取 消</el-button>
       </span>
     </el-dialog>
 
@@ -205,9 +205,10 @@
 
 <script>
   import {mapActions} from 'vuex'
-  import {online, offline, del, getCode,deletFromHome,addForHome,setSortCode} from '@/api/draw'
+  import {online, offline, del, getCode,deletFromHome,addForHome,setSortCode,orderRefund} from '@/api/draw'
   import ListItem from './datalist-item'
   import Search from './data-search'
+  import qs from "qs"
 
 
   export default {
@@ -220,7 +221,7 @@
         type: String,
         default: ''
       },
-      //cece
+      //
       is_homepage:{
         type:String,
         default:''
@@ -234,12 +235,15 @@
         wxcode_url: '',  //小程序路径
         isKnow: false,  //删除弹窗是否知道
         isShowDel: false, //是否显示删除弹窗
-        isReturnMoney:false,//是否退押金弹窗
+        isReturnMoneyDir:false,//是否退押金弹窗
         isShowQrcode: false ,//是否显示二维码弹窗
         uid:'',//发布用户id
         username:'',//发布者名字
         dialogCheck: false,//审核模板
-        depositMoney:'',
+        deposit_info:{//押金的信息
+          id:'',
+          deposit_price:''
+        },
         checkForm: {
           id:'',
           is_affirm: "1",//审核内容
@@ -406,7 +410,7 @@
         this.isShowDel = false
         this.isKnow = ''
       },
-      //cece审核个人抽奖
+      //审核个人抽奖
       checkPerApply(item){
        this.checkForm.id=item.id;
        this.dialogCheck = true;
@@ -428,13 +432,31 @@
            })
         this.dialogCheck = false;
      },
-      //cece退押金
+      //退押金弹窗
       deposiReturn(item){
-        // is_deposit
-        console.log(item);
-        this.isReturnMoney=true
+        //判断押金是否已交
+        if(item.is_deposit=='3'){
+          return;
+        }
+        this.deposit_info.deposit_price=item.deposit_price;
+        this.deposit_info.id=item.id;
+        this.isReturnMoneyDir=true
       },
-      //cece撤下个人抽奖
+      //退押金的api
+      returnMoney(id){
+        orderRefund({
+          data:qs.stringify({id:id})
+        }).then((res)=>{
+            if(res.resultCode==0){
+              this.$message.success(res.errorMsg);
+              this.initList();
+            }else{
+              this.$message.error(res.errorMsg);
+            }
+            this.isReturnMoneyDir = false;
+        })
+      },
+      //撤下个人抽奖
       removePerApply(item){
         this.$confirm("确定将抽奖从首页撤下？", "提示", {
           confirmButtonText: "确定",

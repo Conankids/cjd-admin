@@ -31,13 +31,7 @@
             }
           ],
           recommend_wxcode:[
-            {
-              sponsor_wxcode_name:'',
-              sponsor_btn_name:'',
-              sponsor_wxcode_url:'',
-              cover:'',
-              appid:''
-            }
+          
           ],
           cover: '',
           imgs: [],
