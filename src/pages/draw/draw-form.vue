@@ -80,7 +80,7 @@
         <div style="width: 220px;">选择小程序</div>
         <div style="width: 200px;" class="ml20">页面地址</div>
         <div style="width: 150px;">按钮名称</div>
-        <div style="width: 200px;" class="ml30">封面图：建议尺寸640x400</div>
+        <div style="width: 200px;" class="ml30">封面图：建议尺寸640x480</div>
       </el-row>
       <!-- 添加判断区域 -->
     <div class="wx-wrappper">
@@ -862,7 +862,7 @@
       },
       //初始化form信息
       initFormData() {
-        console.log(this.formData)
+        // console.log(this.formData)
         for (let i in this.info) {
           this.info[i] = this.formData[i]
         }
@@ -959,7 +959,7 @@
       },
       //裁剪后更新图片
       updateImg(cropData) {
-        console.log(cropData);
+        // console.log(cropData);
         this.info.imgs.splice(this.cropperData.idx, 1, cropData)
       },
       //删除产品图片
@@ -976,7 +976,7 @@
       },
        //裁剪后更新图片
       updataWxImg(cropData) {
-        console.log(cropData)
+        // console.log(cropData)
         this.info.recommend_wxcode[this.cropperData.idx].cover=cropData;
       },
       //删除产品图片
@@ -1127,7 +1127,7 @@
             this.info.apply_condition_tips = this.apply_condition_tips
             this.info.sponsor_wxcode_name = this.sponsor_wxcode_name
             this.isSending = true
-            console.log(this.info);
+            // console.log(this.info);
             subEvent({
               url: this.url,
               data: qs.stringify({
