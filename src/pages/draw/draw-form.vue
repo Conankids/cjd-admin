@@ -130,7 +130,6 @@
                :src="`http://s1.jiguo.com/${item.cover}/640`"
                alt="">
         </div>
-
         <!--上传-->
         <el-upload
           class=""
@@ -1038,7 +1037,7 @@
       //添加奖项
       addAward() {
         this.info.meta_list.push(AWARD_ITEM.call(this, 1))
-        // console.log(this.info.meta_list);
+        // console.log(this.info.meta_list);  
       },
       //删除奖项
       delAward(index) {
